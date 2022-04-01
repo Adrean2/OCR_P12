@@ -1,0 +1,4 @@
+django~=4.0.3
+djangorestframework~=3.13.1
+pygresql
+psycopg2
