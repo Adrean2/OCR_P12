@@ -1,5 +1,6 @@
-important
+docs
 .vscode
 Pipfile
 Pipfile.lock
 CRm.txt
+.idea

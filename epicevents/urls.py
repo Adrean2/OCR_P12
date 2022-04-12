@@ -20,10 +20,11 @@ from epiceventss import views
 from rest_framework import routers
 
 router = routers.SimpleRouter()
-router.register(r"users", views.Users)
-router.register(r"clients", views.Client)
+router.register(r"users", views.Users, basename="users")
+router.register(r"clients", views.Client, basename="clients")
 router.register(r"contracts", views.Contract)
 router.register(r"events", views.Event)
+router.register(r"signup", views.Signup)
 
 urlpatterns = [
     path('admin/', admin.site.urls),

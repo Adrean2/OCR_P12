@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+import datetime
 
 
 class User(AbstractUser):
@@ -25,7 +26,7 @@ class Client(models.Model):
     company_name = models.CharField(max_length=250, blank=True)
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now_add=True)
-    sales_contact = models.ForeignKey(User, on_delete=models.CASCADE, related_name='+')
+    sales_contact = models.ForeignKey(User, on_delete=models.CASCADE, related_name='+', blank=True)
     isPotential = models.BooleanField()
 
     def __str__(self):
@@ -36,14 +37,14 @@ class Client(models.Model):
 
 
 class Contract(models.Model):
-    sales_contact = models.ForeignKey(User, on_delete=models.CASCADE, related_name='+')
-    client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='+')
+    sales_contact = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sales_contact')
+    client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='client_contact')
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now_add=True)
-    # je suppose que status = fini ou pas donc True = Fini, False = En cours
+    # Status : Si true alors création évènement possible.
     status = models.BooleanField()
     amount = models.FloatField()
-    payment_due = models.DateTimeField()
+    payment_due = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
         return f"{self.client.company_name}, {self.amount}, {self.payment_due}"
