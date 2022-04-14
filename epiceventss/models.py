@@ -37,7 +37,7 @@ class Client(models.Model):
 
 
 class Contract(models.Model):
-    sales_contact = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sales_contact')
+    sales_contact = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sales_contact', blank=True)
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='client_contact')
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now_add=True)
@@ -54,7 +54,7 @@ class Event(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='+')
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now_add=True)
-    support_contact = models.ForeignKey(User, on_delete=models.CASCADE, related_name='+')
+    support_contact = models.ForeignKey(User, on_delete=models.CASCADE, related_name='+', blank=True)
     event_status = models.ForeignKey(Contract, on_delete=models.CASCADE)
     attendees = models.IntegerField()
     event_date = models.DateTimeField()
@@ -62,6 +62,10 @@ class Event(models.Model):
 
     def __str(self):
         return f"{self.client.company_name}, {self.event_date}, {self.attendees}, {self.event_status.status}"
+
+# class Event_Status(models.Model):
+#     contract = models.ForeignKey(Contract, on_delete=models.CASCADE, blank=True)
+#     event = models.ForeignKey(Event, on_delete=models.CASCADE, blank=True)
 
 # phpsgresql
 # image

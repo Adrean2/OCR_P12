@@ -1,4 +1,4 @@
-from rest_framework.serializers import ModelSerializer, ReadOnlyField, IntegerField
+from rest_framework.serializers import ModelSerializer
 import rest_framework.serializers as s
 from django.contrib.auth.password_validation import validate_password
 from . import models

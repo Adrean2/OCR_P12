@@ -19,7 +19,7 @@ class IsAdminAuthenticated(BasePermission):
 
 
 class ContractPermission(BasePermission):
-    message = ""
+    message = "Vous ne pouvez pas supprimer de contrat"
 
     def has_permission(self, request, view):
         if request.user.is_authenticated:
@@ -51,7 +51,7 @@ class ContractPermission(BasePermission):
 
 
 class ClientPermission(BasePermission):
-    message = ""
+    message = "Vous ne pouvez pas supprimer de client"
 
     def has_permission(self, request, view):
         if request.user.is_authenticated:
@@ -78,7 +78,7 @@ class ClientPermission(BasePermission):
 
 
 class EventPermission(BasePermission):
-    message = ""
+    message = "Vous ne pouvez pas supprimer d'évènements"
 
     def has_permission(self, request, view):
         if request.user.is_authenticated:

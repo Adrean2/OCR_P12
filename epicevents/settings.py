@@ -114,6 +114,9 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+DATE_FORMAT = "Y-m-d"
+DATETIME_FORMAT = "Y-m-d"
+DATETIME_INPUT_FORMATS = "Y-m-d"
 
 LOGGING = {
     'version': 1,
@@ -128,7 +131,7 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['file'],
-            'level': 'DEBUG',
+            'level': 'WARNING',
             'propagate': True,
         },
     },

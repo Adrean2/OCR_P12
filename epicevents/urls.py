@@ -22,8 +22,8 @@ from rest_framework import routers
 router = routers.SimpleRouter()
 router.register(r"users", views.Users, basename="users")
 router.register(r"clients", views.Client, basename="clients")
-router.register(r"contracts", views.Contract)
-router.register(r"events", views.Event)
+router.register(r"contracts", views.Contract, basename="contracts")
+router.register(r"events", views.Event, basename="events")
 router.register(r"signup", views.Signup)
 
 urlpatterns = [
