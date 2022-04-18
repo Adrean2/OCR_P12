@@ -1,15 +1,16 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
-from .permissions import ContractPermission, ClientPermission, EventPermission, IsAdminAuthenticated
+from .permissions import ContractPermission, ClientPermission, EventPermission, IsAdminAuthenticated, IsGestion
 from . import serializers
 from . import models
 from datetime import datetime
+from django.utils import timezone
 
 
 class Users(viewsets.ModelViewSet):
     authentication_classes = [SessionAuthentication, BasicAuthentication]
-    permission_classes = [IsAdminAuthenticated]
+    permission_classes = [IsGestion | IsAdminAuthenticated]
     serializer_class = serializers.UserListSerializer
 
     def get_queryset(self):
@@ -18,11 +19,6 @@ class Users(viewsets.ModelViewSet):
         if role:
             queryset = queryset.filter(role=role)
         return queryset
-
-    def retrieve(self, request, pk=None, **kwargs):
-        queryset = models.User.objects.get(id=pk)
-        serializer = serializers.UserSerializer(queryset, many=False)
-        return Response(serializer.data)
 
 
 class Client(viewsets.ModelViewSet):
@@ -51,11 +47,6 @@ class Client(viewsets.ModelViewSet):
             queryset = models.Client.objects.filter(email=email)
 
         return queryset
-
-    def retrieve(self, request, pk=None, **kwargs):
-        queryset = models.Client.objects.get(id=pk)
-        serializer = serializers.ClientSerializer(queryset, many=False)
-        return Response(serializer.data)
 
     def perform_create(self, serializer):
         if "sales_contact" not in serializer.validated_data:
@@ -99,11 +90,6 @@ class Contract(viewsets.ModelViewSet):
 
         return queryset
 
-    def retrieve(self, request, pk=None, **kwargs):
-        queryset = models.Contract.objects.get(id=pk)
-        serializer = serializers.ContractSerializer(queryset, many=False)
-        return Response(serializer.data)
-
     def perform_create(self, serializer):
         if "sales_contact" not in serializer.validated_data:
             serializer.save(sales_contact=self.request.user)
@@ -118,10 +104,27 @@ class Event(viewsets.ModelViewSet):
 
     def role_queryset(self):
         if self.request.user.role == "C":
-            return models.Client.objects.all()
+            clients = models.Client.objects.filter(sales_contact=self.request.user)
+            events = [client for client in clients]
+            return models.Event.objects.filter(client__in=events)
         if self.request.user.role == "S":
             events = models.Event.objects.filter(support_contact=self.request.user)
             return events
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        # Vérifie si l'évènement est dépassé
+        if instance.event_date > timezone.now():
+            serializer = self.get_serializer(instance, data=request.data, partial=partial)
+            serializer.is_valid(raise_exception=True)
+            self.perform_update(serializer)
+            if getattr(instance, '_prefetched_objects_cache', None):
+                instance._prefetched_objects_cache = {}
+
+            return Response(serializer.data)
+        else:
+            return Response(data={"erreur": "Vous ne pouvez pas modifier un évènement est dépassé"}, status=400)
 
     def get_queryset(self):
         queryset = self.role_queryset()
@@ -143,17 +146,9 @@ class Event(viewsets.ModelViewSet):
 
         return queryset
 
-    def perform_create(self, serializer):
-        if "support_contact" not in serializer.validated_data:
-            serializer.save(support_contact=self.request.user)
-
-    def retrieve(self, request, pk=None, **kwargs):
-        queryset = models.Event.objects.get(id=pk)
-        serializer = serializers.EventSerializer(queryset, many=False)
-        return Response(serializer.data)
-
 
 class Signup(viewsets.ModelViewSet):
-    permission_classes = [IsAdminAuthenticated]
+    permission_classes = [IsGestion]
     serializer_class = serializers.SignUpSerializer
     queryset = models.User.objects.all()
+

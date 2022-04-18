@@ -18,6 +18,15 @@ class IsAdminAuthenticated(BasePermission):
             return super().has_permission(self, request)
 
 
+class IsGestion(BasePermission):
+    def has_permission(self, request, view):
+        if request.user and request.user.is_authenticated and request.user.is_staff:
+            return True
+
+    def has_object_permission(self, request, view, obj):
+        return True
+
+
 class ContractPermission(BasePermission):
     message = "Vous ne pouvez pas supprimer de contrat"
 

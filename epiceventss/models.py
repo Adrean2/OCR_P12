@@ -60,12 +60,5 @@ class Event(models.Model):
     event_date = models.DateTimeField()
     notes = models.TextField(blank=True)
 
-    def __str(self):
-        return f"{self.client.company_name}, {self.event_date}, {self.attendees}, {self.event_status.status}"
-
-# class Event_Status(models.Model):
-#     contract = models.ForeignKey(Contract, on_delete=models.CASCADE, blank=True)
-#     event = models.ForeignKey(Event, on_delete=models.CASCADE, blank=True)
-
-# phpsgresql
-# image
+    def __str__(self):
+        return f"{self.client.company_name}, {self.attendees}, {self.support_contact.username}"

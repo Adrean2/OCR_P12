@@ -2,6 +2,8 @@ from rest_framework.serializers import ModelSerializer
 import rest_framework.serializers as s
 from django.contrib.auth.password_validation import validate_password
 from . import models
+from django.utils import timezone
+from datetime import datetime
 
 
 class UserSerializer(ModelSerializer):
@@ -29,9 +31,10 @@ class SignUpSerializer(ModelSerializer):
             return value
 
     def validate_role(self, value):
-        if value not in ["S,C"]:
+        if value in ["S", "C", "G"]:
+            return value
+        else:
             raise s.ValidationError("Choisissez un rôle valide (S,C)")
-        return value
 
     def create(self, validated_data):
         user = models.User.objects.create(
@@ -39,6 +42,8 @@ class SignUpSerializer(ModelSerializer):
             role=validated_data["role"]
         )
         user.set_password(validated_data['password'])
+        if validated_data["role"] == "G":
+            user.is_staff = True
         user.save()
         return user
 
@@ -71,6 +76,12 @@ class ContractListSerializer(ModelSerializer):
         model = models.Contract
         fields = ["id", "sales_contact", "client", "status", "amount", "payment_due"]
 
+    def validate_client(self, client):
+        if client.isPotential is False:
+            return client
+        else:
+            raise s.ValidationError("Le client est encore potentiel!")
+
 
 class EventSerializer(ModelSerializer):
     client = ClientListSerializer()
@@ -86,3 +97,15 @@ class EventListSerializer(ModelSerializer):
         model = models.Event
         fields = ["id", "client", "support_contact",
                   "event_status", "attendees", "event_date", "notes"]
+
+    def validate_event_status(self, contract):
+        if contract.status is True:
+            return contract
+        else:
+            raise s.ValidationError("Le contract n'a pas été signé")
+
+    def validate_event_date(self, value):
+        if value > timezone.now():
+            return value
+        else:
+            raise s.ValidationError("Vous ne pouvez pas créer d'évènement dont la date est dépassée")
