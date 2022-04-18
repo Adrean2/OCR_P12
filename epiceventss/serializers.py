@@ -82,6 +82,12 @@ class ContractListSerializer(ModelSerializer):
         else:
             raise s.ValidationError("Le client est encore potentiel!")
 
+    def validate_payment_due(self, value):
+        if value > timezone.now():
+            return value
+        else:
+            raise s.ValidationError("Vous ne pouvez pas créer de contrat dont la date de paiement est déjà dépassée")
+
 
 class EventSerializer(ModelSerializer):
     client = ClientListSerializer()
@@ -109,3 +115,9 @@ class EventListSerializer(ModelSerializer):
             return value
         else:
             raise s.ValidationError("Vous ne pouvez pas créer d'évènement dont la date est dépassée")
+
+    def validate_support_contact(self, contact):
+        if contact.role == "S":
+            return contact
+        else:
+            raise s.ValidationError("Vous devez ajouter un référent support")
