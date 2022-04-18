@@ -66,7 +66,7 @@ class Contract(viewsets.ModelViewSet):
             contract = [event.event_status.id for event in events]
             return models.Contract.objects.filter(id__in=contract)
         else:
-            return models.Client.objects.all()
+            return models.Contract.objects.all()
 
     def get_queryset(self):
         queryset = self.role_queryset()
@@ -110,6 +110,8 @@ class Event(viewsets.ModelViewSet):
         if self.request.user.role == "S":
             events = models.Event.objects.filter(support_contact=self.request.user)
             return events
+        else:
+            return models.Event.objects.all()
 
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
@@ -151,4 +153,3 @@ class Signup(viewsets.ModelViewSet):
     permission_classes = [IsGestion]
     serializer_class = serializers.SignUpSerializer
     queryset = models.User.objects.all()
-
