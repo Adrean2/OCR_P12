@@ -54,7 +54,7 @@ class ContractPermission(BasePermission):
                 return False
 
         # Permission admin
-        if request.user.is_superuser:
+        if request.user.is_superuser or request.user.role == "G":
             return True
         return False
 
@@ -81,7 +81,7 @@ class ClientPermission(BasePermission):
                 self.message = "Vous ne pouvez pas modifier/créer de client."
                 return False
 
-        if request.user.is_superuser:
+        if request.user.is_superuser or request.user.role == "G":
             return True
         return False
 
@@ -111,6 +111,6 @@ class EventPermission(BasePermission):
                 else:
                     self.message = "L'évènement est terminé, vous ne pouvez plus le modifier."
 
-        if request.user.is_superuser:
+        if request.user.is_superuser or request.user.role == "G":
             return True
         return False
